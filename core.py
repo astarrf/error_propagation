@@ -1,10 +1,16 @@
 import numpy as np
 
 
+def check_shape(*args):
+    if not all(np.shape(args[0]) == np.shape(arg) for arg in args):
+        raise ValueError("The shapes of the input are not the same")
+
+
 def array(*args, rel_err_check=False):
     if len(args) == 1 and isinstance(args[0], list) and all(isinstance(el, EPArray) for el in args[0]):
         return EPArray.from_list(args[0])
-    elif len(args) == 2:
+    check_shape(*args)
+    if len(args) == 2:
         return EPArray.from_sgm(args[0], args[1])
     elif len(args) == 3:
         if rel_err_check:
@@ -30,17 +36,11 @@ class EPArray:
 
     @classmethod
     def from_sgm(cls, val: np.ndarray, sgm: np.ndarray):
-        if np.shape(val) != np.shape(sgm):
-            raise ValueError(
-                "The shape of the value and the error must be the same")
         rel_err = np.abs(sgm/val)
         return cls(val, sgm, rel_err)
 
     @classmethod
     def from_all(cls, val: np.ndarray, sgm: np.ndarray, rel_err: np.ndarray):
-        if np.shape(val) != np.shape(sgm) or np.shape(val) != np.shape(rel_err):
-            raise ValueError(
-                "The shape of the value, the error, and the relative error must be the same")
         tmp_rel_err = np.abs(sgm/val)
         if not np.allclose(tmp_rel_err, rel_err):
             raise ValueError(
