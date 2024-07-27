@@ -5,26 +5,45 @@ def array(*args):
     if len(args) == 1 and isinstance(args[0], list) and all(isinstance(el, EPArray) for el in args[0]):
         return EPArray.from_list(args[0])
     elif len(args) == 2:
-        return EPArray(args[0], args[1])
+        return EPArray.from_sgm(args[0], args[1])
+    elif len(args) == 3:
+        return EPArray.from_all(args[0], args[1], args[2])
     else:
         raise ValueError("Invalid input")
 
 
 class EPArray:
-    def __init__(self, val: np.ndarray, sgm: np.ndarray):
+    def __init__(self, val: np.ndarray, sgm: np.ndarray, rel_err: np.ndarray):
         # check the shape of the input
-        if np.shape(val) != np.shape(sgm):
-            raise ValueError(
-                "The shape of the value and the error must be the same")
-        self.val = np.array(val)
-        self.sgm = np.array(sgm)
-        self.rel_err = np.abs(self.sgm/self.val)
+        self.val = val
+        self.sgm = sgm
+        self.rel_err = rel_err
 
     @classmethod
     def from_list(cls, error_list: list['EPArray']):
         val = np.array([e.val for e in error_list])
         sgm = np.array([e.sgm for e in error_list])
-        return cls(val, sgm)
+        rel_err = np.array([e.rel_err for e in error_list])
+        return cls(val, sgm, rel_err)
+
+    @classmethod
+    def from_sgm(cls, val: np.ndarray, sgm: np.ndarray):
+        if np.shape(val) != np.shape(sgm):
+            raise ValueError(
+                "The shape of the value and the error must be the same")
+        rel_err = np.abs(sgm/val)
+        return cls(val, sgm, rel_err)
+
+    @classmethod
+    def from_all(cls, val: np.ndarray, sgm: np.ndarray, rel_err: np.ndarray):
+        if np.shape(val) != np.shape(sgm) or np.shape(val) != np.shape(rel_err):
+            raise ValueError(
+                "The shape of the value, the error, and the relative error must be the same")
+        tmp_rel_err = np.abs(sgm/val)
+        if not np.allclose(tmp_rel_err, rel_err):
+            raise ValueError(
+                "The relative error is not consistent with the value and the error")
+        return cls(val, sgm, rel_err)
 
     def __doable_(self, other):
         return np.isscalar(other) or np.shape(other) == np.shape(self.val) or isinstance(other, np.ndarray)

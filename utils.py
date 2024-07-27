@@ -44,3 +44,9 @@ def normalize(Earray: 'EPArray', mode='sum'):
 
 def sum(Earray: 'EPArray', axis=None):
     return array(np.sum(Earray.val, axis), np.sqrt(np.sum(Earray.sgm**2, axis)))
+
+
+def append(Earray: 'EPArray', other: 'EPArray', axis=None):
+    if axis is None:
+        return array(np.append(Earray.val, other.val), np.append(Earray.sgm, other.sgm))
+    return array(np.append(Earray.val, other.val, axis), np.append(Earray.sgm, other.sgm, axis))
