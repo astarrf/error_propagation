@@ -12,11 +12,15 @@ def exp2(Earray: 'EPArray'):
 
 
 def log(Earray: 'EPArray'):
+    if Earray.val.any() <= 0:
+        raise ValueError("Logarithm of non-positive number")
     val = np.log(Earray.val)
     return array(val, np.abs(Earray.rel_err))
 
 
 def log10(Earray: 'EPArray'):
+    if Earray.val.any() <= 0:
+        raise ValueError("Logarithm of non-positive number")
     val = np.log10(Earray.val)
     return array(val, np.abs(Earray.rel_err)/np.log(10))
 
@@ -67,8 +71,9 @@ def tanh(Earray: 'EPArray'):
 
 
 def sqrt(Earray: 'EPArray'):
-    return Earray**0.5
+    if Earray.val.any() < 0:
+        raise ValueError("Square root of negative number")
 
 
 def abs(Earray: 'EPArray'):
-    return array(np.abs(Earray.val), Earray.sgm)
+    return array(np.abs(Earray.val), Earray.sgm, Earray.rel_err, rel_err_check=False)
