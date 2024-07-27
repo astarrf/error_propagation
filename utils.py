@@ -48,5 +48,5 @@ def sum(Earray: 'EPArray', axis=None):
 
 def append(Earray: 'EPArray', other: 'EPArray', axis=None):
     if axis is None:
-        return array(np.append(Earray.val, other.val), np.append(Earray.sgm, other.sgm))
-    return array(np.append(Earray.val, other.val, axis), np.append(Earray.sgm, other.sgm, axis))
+        return array(np.append(Earray.val, other.val), np.append(Earray.sgm, other.sgm), np.append(Earray.rel_err, other.rel_err))
+    return array(np.append(Earray.val, other.val, axis), np.append(Earray.sgm, other.sgm, axis), np.append(Earray.rel_err, other.rel_err, axis))
