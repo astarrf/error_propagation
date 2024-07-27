@@ -1,13 +1,15 @@
 import numpy as np
 
 
-def array(*args):
+def array(*args, rel_err_check=False):
     if len(args) == 1 and isinstance(args[0], list) and all(isinstance(el, EPArray) for el in args[0]):
         return EPArray.from_list(args[0])
     elif len(args) == 2:
         return EPArray.from_sgm(args[0], args[1])
     elif len(args) == 3:
-        return EPArray.from_all(args[0], args[1], args[2])
+        if rel_err_check:
+            return EPArray.from_all(args[0], args[1], args[2])
+        return EPArray(args[0], args[1], args[2])
     else:
         raise ValueError("Invalid input")
 
@@ -79,7 +81,8 @@ class EPArray:
     def __mul__(self, other):
         if isinstance(other, EPArray):
             val = self.val * other.val
-            return array(val, np.abs(val)*np.sqrt(self.rel_err**2 + other.rel_err**2))
+            rel_err = np.sqrt(self.rel_err**2 + other.rel_err**2)
+            return array(val, np.abs(val)*rel_err, rel_err)
         elif self.__doable_(other):
             val = self.val * other
             return array(val, np.abs(other)*self.sgm)
