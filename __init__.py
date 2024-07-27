@@ -5,7 +5,7 @@ from epio import *
 
 # 可查看的模块
 __all__ = ['EPArray', 'array',
-           'size', 'count_error', 'max', 'min', 'normalize', 'sum',
+           'size', 'count_error', 'max', 'min', 'normalize', 'sum', 'mean', 'append',
            'exp', 'exp2', 'log', 'log10', 'sin', 'cos', 'tan', 'arcsin', 'arccos', 'arctan', 'sinh', 'cosh', 'tanh', 'sqrt', 'abs',
            'save', 'load']
 
