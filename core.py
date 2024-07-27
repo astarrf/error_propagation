@@ -82,29 +82,30 @@ class EPArray:
         if isinstance(other, EPArray):
             val = self.val * other.val
             rel_err = np.sqrt(self.rel_err**2 + other.rel_err**2)
-            return array(val, np.abs(val)*rel_err, rel_err)
+            return array(val, np.abs(val)*rel_err, rel_err, rel_err_check=False)
         elif self.__doable_(other):
             val = self.val * other
-            return array(val, np.abs(other)*self.sgm)
+            return array(val, np.abs(other)*self.sgm, self.rel_err, rel_err_check=False)
         raise TypeError(
             "Unsupported operand type(s) for *: 'EPArray' and '{}'".format(type(other).__name__))
 
     def __rmul__(self, other):
         if self.__doable_(other):
             val = other * self.val
-            return array(val, np.abs(other)*self.sgm)
+            return array(val, np.abs(other)*self.sgm, self.rel_err, rel_err_check=False)
         raise TypeError(
             "Unsupported operand type(s) for *: '{}' and 'EPArray'".format(type(other).__name__))
 
     def __truediv__(self, other):
         if isinstance(other, EPArray):
             val = self.val / other.val
-            return array(val, np.abs(val)*np.sqrt(self.rel_err**2 + other.rel_err**2))
+            rel_err = np.sqrt(self.rel_err**2 + other.rel_err**2)
+            return array(val, np.abs(val)*rel_err, rel_err, rel_err_check=False)
         elif self.__doable_(other):
             if other == 0:
                 raise ValueError("Division by zero")
             val = self.val / other
-            return array(val, self.sgm/np.abs(other))
+            return array(val, self.sgm/np.abs(other), self.rel_err, rel_err_check=False)
         raise TypeError(
             "Unsupported operand type(s) for /: 'EPArray' and '{}'".format(type(other).__name__))
 
@@ -115,15 +116,18 @@ class EPArray:
         if self.val.any() == 0:
             raise ValueError("Division by zero")
         val = other / self.val
-        return array(val, np.abs(val)*self.rel_err)
+        return array(val, np.abs(val)*self.rel_err, self.rel_err, rel_err_check=False)
 
     def __pow__(self, other):
         if isinstance(other, EPArray):
             val = self.val ** other.val
-            return array(val, np.abs(val)*np.sqrt(self.rel_err**2*other.val**2 + (np.log(self.val)*other.sgm)**2))
+            rel_err = np.sqrt(self.rel_err**2*other.val**2 +
+                              (np.log(self.val)*other.sgm)**2)
+            return array(val, np.abs(val)*rel_err, rel_err, rel_err_check=False)
         elif self.__doable_(other):
             val = self.val ** other
-            return array(val, np.abs(val*other)*self.rel_err)
+            rel_err = np.abs(other)*self.rel_err
+            return array(val, np.abs(val)*rel_err, rel_err, rel_err_check=False)
         raise TypeError(
             "Unsupported operand type(s) for **: 'EPArray' and '{}'".format(type(other).__name__))
 
@@ -132,7 +136,8 @@ class EPArray:
             raise TypeError(
                 "Unsupported operand type(s) for **: '{}' and 'EPArray'".format(type(other).__name__))
         val = other ** self.val
-        return array(val, np.abs(val*np.log(other))*self.sgm)
+        rel_err = np.abs(np.log(other))*self.sgm
+        return array(val, np.abs(val) * rel_err, rel_err, rel_err_check=False)
 
     def __str__(self):
         info = np.array([self.val, self.sgm]).T
