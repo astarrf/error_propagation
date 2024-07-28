@@ -6,9 +6,9 @@ def size(Earray: 'EPArray', axis=None) -> int:
     return Earray.val.size if axis is None else Earray.val.shape[axis]
 
 
-def count_error(cnt_list: list):
+def count_error(cnt_list: np.ndarray) -> 'EPArray':
     if all(isinstance(el, int) for el in cnt_list):
-        return array(cnt_list, np.sqrt(cnt_list))
+        return array(np.array(cnt_list), np.sqrt(cnt_list))
     raise ValueError("Invalid input")
 
 

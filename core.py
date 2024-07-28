@@ -52,15 +52,15 @@ class EPArray:
 
     def __add__(self, other):
         if isinstance(other, EPArray):
-            return EPArray(self.val + other.val, np.sqrt(self.sgm**2 + other.sgm**2))
+            return array(self.val + other.val, np.sqrt(self.sgm**2 + other.sgm**2))
         elif self.__doable_(other):
-            return EPArray(self.val + other, self.sgm)
+            return array(self.val + other, self.sgm)
         raise TypeError(
             "Unsupported operand type(s) for +: 'EPArray' and '{}'".format(type(other).__name__))
 
     def __radd__(self, other):
         if self.__doable_(other):
-            return EPArray(self.val + other, self.sgm)
+            return array(self.val + other, self.sgm)
         raise TypeError(
             "Unsupported operand type(s) for +: '{}' and 'EPArray'".format(type(other).__name__))
 
@@ -141,6 +141,8 @@ class EPArray:
 
     def __str__(self):
         info = np.array([self.val, self.sgm]).T
+        if self.val.size == 1:
+            return f"[{info[0]}±{info[1]}]"
         return f"[{', '.join([f'{v[0]}±{v[1]}' for v in info])}]"
 
     def __repr__(self):
@@ -148,8 +150,13 @@ class EPArray:
         # return self.__str__()
 
     def __getitem__(self, index):
-        return array(self.val[index], self.sgm[index])
+        return array(self.val[index], self.sgm[index], self.rel_err[index], rel_err_check=False)
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index, value: 'EPArray'):
+        tmp_rel_err = np.abs(value.sgm/value.val)
+        if not np.allclose(tmp_rel_err, value.rel_err):
+            raise ValueError(
+                "The relative error is not consistent with the value and the error")
         self.val[index] = value.val
         self.sgm[index] = value.sgm
+        self.rel_err[index] = value.rel_err
