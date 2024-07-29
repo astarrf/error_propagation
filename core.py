@@ -160,3 +160,24 @@ class EPArray:
         self.val[index] = value.val
         self.sgm[index] = value.sgm
         self.rel_err[index] = value.rel_err
+
+    def __len__(self):
+        return len(self.val)
+
+    def __iter__(self):
+        return iter(self.val)
+
+    def __next__(self):
+        return next(self.val)
+
+    def __eq__(self, other: 'EPArray'):
+        return np.allclose(self.val, other.val) and np.allclose(self.sgm, other.sgm) and np.allclose(self.rel_err, other.rel_err)
+
+    def __ne__(self, other: 'EPArray'):
+        return not self.__eq__(other)
+
+    def reshape(self, *args):
+        return array(self.val.reshape(*args), self.sgm.reshape(*args), self.rel_err.reshape(*args), rel_err_check=False)
+
+    def flatten(self):
+        return array(self.val.flatten(), self.sgm.flatten(), self.rel_err.flatten(), rel_err_check=False)
