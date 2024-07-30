@@ -1,5 +1,5 @@
 import numpy as np
-from core import EPArray, array
+from .core import EPArray, array
 
 
 def size(Earray: 'EPArray', axis=None) -> int:

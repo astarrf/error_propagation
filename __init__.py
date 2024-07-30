@@ -1,7 +1,7 @@
-from core import *
-from utils import *
-from function import *
-from epio import *
+from .core import *
+from .utils import *
+from .function import *
+from .epio import *
 
 # 可查看的模块
 __all__ = ['EPArray', 'array',
