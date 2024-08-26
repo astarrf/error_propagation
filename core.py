@@ -20,6 +20,12 @@ def array(*args, rel_err_check=False):
         raise ValueError("Invalid input")
 
 
+def num(val: float, sgm: float, rel_err: float = None):
+    if rel_err is None:
+        rel_err = np.abs(sgm/val)
+    return array(np.array([val]), np.array([sgm]), np.array([rel_err]), rel_err_check=False)
+
+
 class EPArray:
     def __init__(self, val: np.ndarray, sgm: np.ndarray, rel_err: np.ndarray):
         # check the shape of the input
